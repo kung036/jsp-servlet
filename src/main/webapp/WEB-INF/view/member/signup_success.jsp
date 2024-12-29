@@ -12,6 +12,6 @@
 </head>
 <body>
     <h1>회원가입 완료</h1>
-    <a href="/WEB-INF/view/login/login.jsp">로그인 페이지로 이동</a>
+    <a href="/Login.do?action=login">로그인 페이지로 이동</a>
 </body>
 </html>

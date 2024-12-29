@@ -6,6 +6,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MemberDao {
@@ -53,5 +54,36 @@ public class MemberDao {
         } finally {
             closeConnection(con);
         }
+    }
+
+    public String readMemberPassword(String id, String password) {
+        String result = "fail";
+        Connection con = null;
+        try {
+            con = getConnection();
+            String sql = "select id, name, password, email, address from member " +
+                    "where id = ?";
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, id);
+
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()) {
+                String findPw = rs.getString("password");
+                if(findPw.equals(password)) {
+                    result = "success";
+                    System.out.println("로그인 성공");
+                } else {
+                    throw new RuntimeException("ID/PW가 없습니다.");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Member select error : " + e.getMessage());
+        } catch (RuntimeException e) {
+            System.out.println("Member select error : " + e.getMessage());
+        } finally {
+            closeConnection(con);
+        }
+
+        return result;
     }
 }
