@@ -33,7 +33,8 @@
                 <td class="field"><input type="text" name="address" size="50" value="${member.address}" readonly></td>
             </tr>
         </table>
-        <a href="/member/Member.do?action=update">회원정보 변경</a>
+        <a href="/member/Member.do?action=update">회원정보 변경</a> <br>
+        <a href="/member/Member.do?action=delete">회원탈퇴</a> <br>
     </fieldset>
 </form>
 </body>

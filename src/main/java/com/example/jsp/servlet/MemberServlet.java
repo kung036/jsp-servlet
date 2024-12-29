@@ -36,7 +36,7 @@ public class MemberServlet extends HttpServlet {
             // 회원가입 성공
             System.out.println("!! success");
             view = "signup_success.jsp";
-        } else if ("get".equals(action) || "update".equals(action)) {
+        } else if ("get".equals(action) || "update".equals(action) || "delete".equals(action)) {
             // 회원정보 조회
             String id = (String) req.getSession().getAttribute("id");
 
@@ -50,13 +50,16 @@ public class MemberServlet extends HttpServlet {
             MemberDto member = memberDao.readMember(id);
             req.setAttribute("member", member);
             view = "mypage.jsp";
-            if("update".equals(action)) {
+            if ("update".equals(action)) {
                 view = "update.jsp";
                 req.setAttribute("action", "update");
+            } else if ("delete".equals(action)) {
+                view = "passwordform.jsp";
+                req.setAttribute("action", "delete");
             }
         }
 
-        // 회원가입 페이지로 이동
+        // 페이지로 이동
         RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/view/member/" + view);
         dispatcher.forward(req, resp);
     }
@@ -102,8 +105,24 @@ public class MemberServlet extends HttpServlet {
             );
             memberDao.updateMember(member);
 
-            // 회원가입 성공 페이지로 이동
+            // 회원 조회 페이지로 이동
             resp.sendRedirect("/member/Member.do?action=get");
+        } else if ("delete".equals(action)) {
+            // 회원정보 삭제
+            String id = (String) req.getSession().getAttribute("id");
+
+            // 로그인이 안되어 있는 경우
+            if (id == null) {
+                RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/view/login/login.jsp");
+                dispatcher.forward(req, resp);
+                return;
+            }
+
+            String password = req.getParameter("password");
+            memberDao.deleteMember(id, password);
+
+            // 회원가입 페이지로 이동
+            resp.sendRedirect("/member/Member.do?action=insert");
         }
     }
 }

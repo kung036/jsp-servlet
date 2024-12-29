@@ -138,4 +138,21 @@ public class MemberDao {
             closeConnection(con);
         }
     }
+
+    public void deleteMember(String id, String password) {
+        Connection con = null;
+        try {
+            con = getConnection();
+            String sql = "delete from member where id = ? and password = ?";
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, id);
+            pstmt.setString(2, password);
+            int rowCount = pstmt.executeUpdate();
+            System.out.println(rowCount + " row(s) deleted.");
+        } catch (SQLException e) {
+            throw new RuntimeException("Member delete error : " + e);
+        } finally {
+            closeConnection(con);
+        }
+    }
 }
