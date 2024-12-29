@@ -24,8 +24,9 @@
     %>
 
     <!-- 로그인한 사용자일 경우 -->
-    <%= session.getAttribute("id") %>님 환경합니다.<br>
+    <%= session.getAttribute("id") %>님 환영합니다.<br>
     <a href="/Login.do">로그아웃</a>
+    <a href="/member/Member.do?action=get">마이페이지</a>
 
     <%
         }

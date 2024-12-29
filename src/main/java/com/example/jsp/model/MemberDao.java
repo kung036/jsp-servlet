@@ -86,4 +86,56 @@ public class MemberDao {
 
         return result;
     }
+
+    public MemberDto readMember(String id) {
+        Connection con = null;
+        MemberDto member = null;
+
+        try {
+            con = getConnection();
+            String sql = "select id, name, password, email, address from member " +
+                    "where id = ?";
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, id);
+
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()) {
+                member = new MemberDto(
+                        rs.getString("id"),
+                        rs.getString("name"),
+                        rs.getString("password"),
+                        rs.getString("email"),
+                        rs.getString("address")
+                );
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Member select error : " + e);
+        } finally {
+            closeConnection(con);
+        }
+
+        return member;
+    }
+
+    public void updateMember(MemberDto member) {
+        Connection con = null;
+        try {
+            con = getConnection();
+            String sql = "update member set name = ?, password = ?, email = ?, address = ? " +
+                    "where id = ?";
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, member.getName());
+            pstmt.setString(2, member.getPassword());
+            pstmt.setString(3, member.getEmail());
+            pstmt.setString(4, member.getAddress());
+            pstmt.setString(5, member.getId());
+
+            int rowCount = pstmt.executeUpdate();
+            System.out.println(rowCount + " row(s) updated.");
+        } catch (SQLException e) {
+            throw new RuntimeException("Member update error : " + e);
+        } finally {
+            closeConnection(con);
+        }
+    }
 }

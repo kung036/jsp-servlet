@@ -24,18 +24,36 @@ public class MemberServlet extends HttpServlet {
         String action = (String) req.getParameter("action");
         System.out.println("!! request action : " + action);
         String view = "signup.jsp";
-        if(action == null) {
+        if (action == null) {
             // 회원 정보 조회
             req.setAttribute("action", "insert");
 
-        } else if("insert".equals(action)) {
+        } else if ("insert".equals(action)) {
             // 회원가입
             view = "signup.jsp";
             req.setAttribute("action", "insert");
-        } else if("success".equals(action)) {
+        } else if ("success".equals(action)) {
             // 회원가입 성공
             System.out.println("!! success");
             view = "signup_success.jsp";
+        } else if ("get".equals(action) || "update".equals(action)) {
+            // 회원정보 조회
+            String id = (String) req.getSession().getAttribute("id");
+
+            // 로그인이 안되어 있는 경우
+            if (id == null) {
+                RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/view/login/login.jsp");
+                dispatcher.forward(req, resp);
+                return;
+            }
+
+            MemberDto member = memberDao.readMember(id);
+            req.setAttribute("member", member);
+            view = "mypage.jsp";
+            if("update".equals(action)) {
+                view = "update.jsp";
+                req.setAttribute("action", "update");
+            }
         }
 
         // 회원가입 페이지로 이동
@@ -50,7 +68,7 @@ public class MemberServlet extends HttpServlet {
 
         String action = (String) req.getParameter("action");
         System.out.println("!! action : " + action);
-        if("insert".equals(action) || action == null) {
+        if ("insert".equals(action) || action == null) {
             // 회원가입할 객체 생성
             MemberDto member = new MemberDto(
                     req.getParameter("id"),
@@ -59,15 +77,33 @@ public class MemberServlet extends HttpServlet {
                     req.getParameter("email"),
                     req.getParameter("address")
             );
-            System.out.println("!! name : " + req.getParameter("name"));
 
             // DB 저장
-            System.out.println("!! 데이터 저장 전");
             memberDao.createMember(member);
-            System.out.println("!! 데이터 저장");
 
             // 회원가입 성공 페이지로 이동
             resp.sendRedirect("/member/Member.do?action=success");
+        } else if ("update".equals(action)) {
+            // 회원정보수정
+            String id = (String) req.getSession().getAttribute("id");
+
+            // 로그인이 안되어 있는 경우
+            if (id == null) {
+                RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/view/login/login.jsp");
+                dispatcher.forward(req, resp);
+            }
+
+            MemberDto member = new MemberDto(
+                    id,
+                    req.getParameter("name"),
+                    req.getParameter("password"),
+                    req.getParameter("email"),
+                    req.getParameter("address")
+            );
+            memberDao.updateMember(member);
+
+            // 회원가입 성공 페이지로 이동
+            resp.sendRedirect("/member/Member.do?action=get");
         }
     }
 }
